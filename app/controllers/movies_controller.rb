@@ -10,8 +10,16 @@ class MoviesController < ApplicationController
     # will render app/views/movies/show.<extension> by default
   end
 
+  helper_method :sort_this
+  def sort_this(col)
+    if params[:sort] == col
+      'hilite'
+    end 
+  end 
+
   def index
-    @movies = Movie.all
+    puts params
+    @movies = Movie.order(params[:sort])
   end
 
   def new
