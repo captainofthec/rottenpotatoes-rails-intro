@@ -18,7 +18,7 @@ class MoviesController < ApplicationController
   end 
 
   def index
-    puts params
+    @all_ratings = all_ratings
     @movies = Movie.order(params[:sort])
   end
 
@@ -41,6 +41,10 @@ class MoviesController < ApplicationController
     @movie.update_attributes!(movie_params)
     flash[:notice] = "#{@movie.title} was successfully updated."
     redirect_to movie_path(@movie)
+  end
+  
+  def all_ratings 
+    Movie.select(:rating).map(&:rating).uniq
   end
 
   def destroy
