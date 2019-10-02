@@ -8,6 +8,7 @@ class MoviesController < ApplicationController
     id = params[:id] # retrieve movie ID from URI route
     @movie = Movie.find(id) # look up movie by unique ID
     # will render app/views/movies/show.<extension> by default
+    
   end
 
   helper_method :sort_this
@@ -15,11 +16,34 @@ class MoviesController < ApplicationController
     if params[:sort] == col
       'hilite'
     end 
+
   end 
 
   def index
+    
+    if params["ratings"].nil? or params[:sort].nil?
+      params[:sort] ||= session[:sort] || ""
+      
+      params["ratings"] ||= session["ratings"] || Hash[all_ratings.collect{|rating| [rating,"1"]} ]
+      
+      flash.keep
+      redirect_to movies_path(:sort => params[:sort], "ratings" => params["ratings"])
+      return
+    end
+    
     @all_ratings = all_ratings
+    
     @movies = Movie.order(params[:sort])
+    
+    
+    
+    if !(params["ratings"].nil?)
+      @movies = @movies.where(:rating => params["ratings"].map{|k,v| k if v == "1"}.to_a)
+    end
+    
+    session["ratings"] = params["ratings"]
+    session[:sort] = params[:sort]
+    
   end
 
   def new
